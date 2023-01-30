@@ -15,20 +15,22 @@ import {
   Transport,
   ClientProxyFactory,
 } from '@nestjs/microservices';
-import { get } from 'http';
+
 import { Observable } from 'rxjs';
+import { ClientProxySmartRanking } from 'src/proxyrmq/client-proxy';
 import { AtualizarCategoriaDto } from './dtos/atualizar-categoria.dto';
 import { CriarCategoriaDto } from './dtos/criar-categoria.dto';
 
-@Controller('api/v1')
-export class AppController {
-  private logger = new Logger(AppController.name);
-  private clientAdminbackend: ClientProxy;
-
+@Controller('api/v1/categorias')
+export class CategoriasController {
+  private logger = new Logger(CategoriasController.name);
+  //private clientAdminbackend: ClientProxy;
+  /*
   async onApplicationBootstrap() {
     await this.clientAdminbackend.connect();
   }
-
+*/
+  /*
   constructor() {
     //injeção de dependência pelo construtor
     this.clientAdminbackend = ClientProxyFactory.create({
@@ -39,8 +41,13 @@ export class AppController {
       },
     });
   }
+  */
+  constructor(private clientProxySmartRanking: ClientProxySmartRanking) {}
 
-  @Post('categorias')
+  private clientAdminbackend =
+    this.clientProxySmartRanking.getClientProxyAdminBackendInstance();
+
+  @Post()
   @UsePipes(ValidationPipe)
   CriarCategoriaDto(@Body() criarCategoriaDto: CriarCategoriaDto) {
     //enviando mensagem para o topico
@@ -51,13 +58,13 @@ export class AppController {
     );
   }
 
-  @Get('categorias')
+  @Get()
   consultarCategorias(@Query('idCategoria') _id: string): Observable<any> {
     this.clientAdminbackend.connect();
     return this.clientAdminbackend.send('consultar-categorias', _id ? _id : '');
   }
 
-  @Put('categorias/:_id')
+  @Put(':_id')
   @UsePipes(ValidationPipe)
   async atualizarCategoria(
     @Body() atualizarCategoriaDto: AtualizarCategoriaDto,
