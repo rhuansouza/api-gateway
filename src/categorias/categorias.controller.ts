@@ -24,6 +24,9 @@ import { CriarCategoriaDto } from './dtos/criar-categoria.dto';
 @Controller('api/v1/categorias')
 export class CategoriasController {
   private logger = new Logger(CategoriasController.name);
+  async onApplicationBootstrap() {
+    await this.clientAdminbackend.connect();
+  }
   //private clientAdminbackend: ClientProxy;
   /*
   async onApplicationBootstrap() {
@@ -43,7 +46,6 @@ export class CategoriasController {
   }
   */
   constructor(private clientProxySmartRanking: ClientProxySmartRanking) {}
-
   private clientAdminbackend =
     this.clientProxySmartRanking.getClientProxyAdminBackendInstance();
 
@@ -60,7 +62,6 @@ export class CategoriasController {
 
   @Get()
   consultarCategorias(@Query('idCategoria') _id: string): Observable<any> {
-    this.clientAdminbackend.connect();
     return this.clientAdminbackend.send('consultar-categorias', _id ? _id : '');
   }
 
